@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginAPI {
 
-    private Long numeroConta;
+    private String documento;
     private String senha;
 }

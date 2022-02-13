@@ -59,4 +59,6 @@ public class ContaEntity {
     @Column(name="DS_SENHA")
     private String senha;
 
+    private String erro;
+
 }

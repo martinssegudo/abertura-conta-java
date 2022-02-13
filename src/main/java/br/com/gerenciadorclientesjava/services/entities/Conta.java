@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -25,4 +24,5 @@ public class Conta {
             private String nomeDoPai;
             private String nomeDaMae;
             private String senha;
+            private String erro;
 }

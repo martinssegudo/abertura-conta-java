@@ -8,9 +8,11 @@ import br.com.gerenciadorclientesjava.factory.contracts.FabricaInstancias;
 import br.com.gerenciadorclientesjava.services.contracts.ContaService;
 import br.com.gerenciadorclientesjava.services.entities.Conta;
 import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -53,32 +55,38 @@ public class ApiContaImpl implements ApiConta {
         return ResponseEntity.ok(contaJuridicaAPI);
     }
 
-    @GetMapping(value = "/listar")
+    @GetMapping(value = "/{documento}")
     @Override
-    public ResponseEntity<List<ContaAPI>> listarContas() {
-        return ResponseEntity.ok(new ContaApiAdapter(contaService.listarTodos()).getContasAPI());
+    public ResponseEntity<List<ContaAPI>> contaPorDocumento(@PathVariable String documento) throws ContaException {
+
+               List<Conta> conta = contaService.buscaPorDocumento(documento);
+               if(new ContaApiAdapter(conta).getContasAPI().isEmpty()){
+                   conta.add(Conta.builder()
+                           .erro("Não existe conta cadastrada para o documento informado")
+                           .build());
+                   return ResponseEntity.status(403).body(new ContaApiAdapter(conta).getContasAPI());
+               }
+
+        return ResponseEntity.ok(new ContaApiAdapter(conta).getContasAPI());
     }
 
-    @GetMapping(value = "/{numeroConta}")
-    @Override
-    public ResponseEntity<ContaAPI> contaPorId(@PathVariable Long numeroConta) {
-        return ResponseEntity.ok(new ContaApiAdapter(contaService.buscaPorId(numeroConta)).getContaAPI());
-    }
 
-
-    @PostMapping(value = "/login")
+    @GetMapping(value = "/login/{documento}/{senha}")
     @ResponseBody
-    public ResponseEntity<String> login(@RequestBody LoginAPI loginApi) {
+    @Override
+    public ResponseEntity<ContaAPI> login(@PathVariable String documento, @PathVariable String senha) {
         List<Conta> contas = contaService.listarTodos();
         for (Conta other : contas) {
-            if (other.getNumeroConta().equals(loginApi.getNumeroConta()) &&
-                    other.getSenha().equals(loginApi.getSenha())
+
+            if (other.getDocumento().equals(documento) &&
+                    other.getSenha().equals(senha)
                    ) {
-                return ResponseEntity.ok()
-                        .body("Logado com Sucesso");
+                return ResponseEntity.ok(new ContaApiAdapter(other).getContaAPI());
             }
+
         }
-        return ResponseEntity.ok()
-                .body("Falha ao Logar");
+        return ResponseEntity.status(403).body(new ContaApiAdapter(Conta.builder()
+                .erro("Login Invalido")
+                .build()).getContaAPI());
     }
 }

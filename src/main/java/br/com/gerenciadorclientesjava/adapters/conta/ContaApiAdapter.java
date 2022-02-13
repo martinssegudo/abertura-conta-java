@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 public class ContaApiAdapter {
+
     private ContaAPI contaAPI;
     private List<ContaAPI> contasAPI;
 
@@ -37,6 +38,7 @@ public class ContaApiAdapter {
                 .tipoConta(conta.getTipoConta())
                 .documento(conta.getDocumento())
                 .serasa(conta.getSerasa())
+                .erro(conta.getErro())
                 .build();
     }
 }

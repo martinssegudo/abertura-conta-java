@@ -25,4 +25,5 @@ public class ContaAPI {
        private Integer tipoConta;
        private String documento;
        private Integer serasa;
+       private String erro;
 }
