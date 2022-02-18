@@ -41,13 +41,15 @@ public class ContaEntity {
 
     @Column(name="DATA")
     @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date data;
+    private String data;
 
     @Column(name="ID_TIPO_CONTA")
     private Integer tipoConta;
 
+
     @Column(name="DS_DOCUMENTO")
     private String documento;
+
     @Column(name="DS_RG")
     private String rg;
     @Column(name="DS_SERASA")
@@ -56,6 +58,7 @@ public class ContaEntity {
     private String nomeDoPai;
     @Column(name="DS_NOME_MAE")
     private String nomeDaMae;
+
     @Column(name="DS_SENHA")
     private String senha;
 

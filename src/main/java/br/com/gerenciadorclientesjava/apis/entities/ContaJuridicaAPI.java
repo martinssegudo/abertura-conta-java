@@ -20,7 +20,7 @@ public class ContaJuridicaAPI {
             private String razaoSocial;
 
             @DateTimeFormat(pattern = "dd/MM/yyyy")
-            private Date dataAbertura;
+            private String dataAbertura;
 
             private Integer tipoConta;
             private String cnpj;

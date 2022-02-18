@@ -16,10 +16,6 @@ public class ContaServiceAdapter {
     private Conta conta;
     private List<Conta> contas;
 
-    public ContaServiceAdapter(ContaAPI contaAPI) {
-        this.conta = convertContaApiEmConta(contaAPI);
-    }
-
     public ContaServiceAdapter(ContaJuridicaAPI contaJuridicaAPI) {
         this.conta = convertContaJuridicaApiEmConta(contaJuridicaAPI);
     }

@@ -13,4 +13,6 @@ public interface ContaService {
     List<Conta> listarTodos();
 
     List<Conta> buscaPorDocumento(String documento) throws ContaException;
+
+    Conta login(String documento, String senha) throws ContaException;
 }

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -15,15 +14,16 @@ import java.util.Date;
 @Builder
 public class ContaAPI {
 
-       private Long numeroConta;
-       private Integer tipoPessoa;
-       private String nome;
+    private Long numeroConta;
+    private Integer tipoPessoa;
+    private String nome;
 
-       @DateTimeFormat(pattern = "dd/MM/yyyy")
-       private Date data;
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private String data;
 
-       private Integer tipoConta;
-       private String documento;
-       private Integer serasa;
-       private String erro;
+    private String senha;
+    private Integer tipoConta;
+    private String documento;
+    private Integer serasa;
+    private String erro;
 }

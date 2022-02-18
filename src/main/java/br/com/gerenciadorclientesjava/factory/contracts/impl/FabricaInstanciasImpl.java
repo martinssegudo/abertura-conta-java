@@ -20,7 +20,7 @@ public class FabricaInstanciasImpl implements FabricaInstancias {
 
     @Override
     public ContaService getContaServiceImple() {
-        return ContaServiceImpl.getInstance(repositorioContaEntity);
+        return ContaServiceImpl.getInstance(this.repositorioContaEntity);
     }
 
 }

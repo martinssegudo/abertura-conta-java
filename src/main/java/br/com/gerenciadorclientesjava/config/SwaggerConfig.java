@@ -40,7 +40,7 @@ public class SwaggerConfig {
 
     private StringBuilder buildDescription() {
         StringBuilder text = new StringBuilder();
-        text.append("Um exemplo de processo de Abertura de conta para aplicaçao Bancaria com Spring Boot REST API e documentada com Swagger");
+        text.append("API de Abertura de conta e gerenciamento de clientes para aplicaçao Bancaria com Spring Boot REST API e documentada com Swagger");
         return text;
     }
 }

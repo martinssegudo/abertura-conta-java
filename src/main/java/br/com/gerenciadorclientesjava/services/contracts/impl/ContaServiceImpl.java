@@ -7,16 +7,24 @@ import br.com.gerenciadorclientesjava.db.entities.ContaEntity;
 import br.com.gerenciadorclientesjava.services.contracts.ContaService;
 import br.com.gerenciadorclientesjava.services.entities.Conta;
 import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
+import br.com.gerenciadorclientesjava.services.util.ContaUtil;
 import br.com.gerenciadorclientesjava.services.util.DataUtil;
 import br.com.gerenciadorclientesjava.services.util.StringUtil;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.persistence.NonUniqueResultException;
+import java.text.ParseException;
 import java.util.List;
 
+@Service
 public class ContaServiceImpl implements ContaService {
 
     private final RepositorioContaEntity contaRepositorio;
     private static ContaService instance;
 
+    @Autowired
     public ContaServiceImpl(RepositorioContaEntity contaRepositorio){
         this.contaRepositorio = contaRepositorio;
     }
@@ -32,16 +40,21 @@ public class ContaServiceImpl implements ContaService {
     public ContaEntity salvarConta(Conta conta) throws ContaException {
 
         try {
-            StringUtil.validaPessoaEConta(conta.getTipoPessoa(), conta.getTipoConta());
-            DataUtil.validaNascimento(conta.getTipoPessoa(), conta.getData());
+
             StringUtil.validaDocumento(conta.getDocumento());
-            StringUtil.validaSenha(conta);
+            ContaUtil.validaPessoaEConta(conta.getDocumento(), conta.getTipoPessoa(), conta.getTipoConta());
+            DataUtil.validaNascimento(conta.getTipoPessoa(), conta.getData());
+            StringUtil.validaNomeComDezCaracteres(conta.getTipoPessoa(),conta.getNome());
+            StringUtil.validaNomeComDezCaracteres(conta.getTipoPessoa(),conta.getNomeDaMae());
+            StringUtil.validaRg(conta.getTipoPessoa(), conta.getRg());
+            StringUtil.validaSenha(conta.getSenha());
             contaRepositorio.save(new ContaEntityAdapter(conta).getContaEntity());
-            // conta = StringUtil.validaConta(conta);
-        }catch(ContaException e){
-            e.getMessage();
-        }
-        return new ContaEntityAdapter(conta).getContaEntity();
+            return new ContaEntityAdapter(conta).getContaEntity();
+
+        }catch(ContaException | ParseException e){
+           throw new ContaException(e.getMessage());
+       }
+
     }
 
     @Override
@@ -53,9 +66,23 @@ public class ContaServiceImpl implements ContaService {
     @Override
     public List<Conta> buscaPorDocumento(String documento) throws ContaException {
 
+        StringUtil.validaDocumento(documento);
         if(contaRepositorio.findByDocumento(documento) == null){
             throw new ContaException("Conta Inexistente");
         }
     return new ContaServiceAdapter(contaRepositorio.findByDocumento(documento)).getContas();
+    }
+
+    @Override
+    public Conta login(String documento, String senha) throws ContaException {
+
+        StringUtil.validaDocumento(documento);
+        StringUtil.validaSenha(senha);
+
+        if(contaRepositorio.findByDocumentoESenha(documento, senha) == null){
+            throw new ContaException("Conta Inexistente");
+        }
+
+        return new ContaServiceAdapter(contaRepositorio.findByDocumentoESenha(documento, senha)).getConta();
     }
 }

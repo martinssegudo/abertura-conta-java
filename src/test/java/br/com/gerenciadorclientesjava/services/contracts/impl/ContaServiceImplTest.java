@@ -33,38 +33,14 @@ public class ContaServiceImplTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Test
-    public void testSalvarContaMaior18Sucesso() throws Exception {
-
-        ContaEntity conta = ContaEntity.builder()
-                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
-                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
-                .nome("Claudio Francisco das Neves")
-                .senha("@Neves123")
-                .build();
-
-        ContaEntity contaReturn = ContaEntity.builder()
-                .numeroConta(1L)
-                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
-                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
-                .nome("Claudio Francisco das Neves")
-                .senha("@Neves123")
-                .build();
-
-                when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
-                ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-                Assert.assertNotNull(createConta);
-    }
-
     @Test(expected = ContaException.class)
-    public void testSalvarContaMenor18Sucesso() throws Exception {
+    public void testSalvarContaDocumentoEmBrancoErro() throws Exception {
 
         ContaEntity conta = ContaEntity.builder()
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2022, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
@@ -73,14 +49,94 @@ public class ContaServiceImplTest {
                 .numeroConta(1L)
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2022, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("")
+                .data("20/02/2020")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
+    }
+
+
+    @Test
+    public void testSalvarContaFisicaMaior18Sucesso() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .build();
+
+                when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+                ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaFisicaNomeDaMaeEmBrancoErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("")
+                .senha("@Neves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaFisicaMenor18Erro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .data("20/02/2022")
+                .rg("305965827")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .data("20/02/2022")
+                .rg("305965827")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
     }
 
     @Test(expected = ContaException.class)
@@ -89,7 +145,8 @@ public class ContaServiceImplTest {
         ContaEntity conta = ContaEntity.builder()
                 .tipoConta(2)
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
@@ -98,23 +155,24 @@ public class ContaServiceImplTest {
                 .numeroConta(1L)
                 .tipoConta(2)
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
     }
 
     @Test(expected = ContaException.class)
-    public void testSalvarTipoPessoaErrada() throws Exception {
+    public void testSalvarContaTipoPessoaErradaErro() throws Exception {
 
         ContaEntity conta = ContaEntity.builder()
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(2)
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
@@ -123,23 +181,24 @@ public class ContaServiceImplTest {
                 .numeroConta(1L)
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(2)
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
     }
 
     @Test(expected = ContaException.class)
-    public void testSalvarTipoPessoaEContaErrada() throws Exception {
+    public void testSalvarContaTipoPessoaEContaErradaErro() throws Exception {
 
         ContaEntity conta = ContaEntity.builder()
                 .tipoConta(2)
                 .tipoPessoa(2)
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
@@ -148,23 +207,25 @@ public class ContaServiceImplTest {
                 .numeroConta(1L)
                 .tipoConta(2)
                 .tipoPessoa(2)
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
                 .senha("@Neves123")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
     }
 
     @Test(expected = ContaException.class)
-    public void testSalvarNomeMenorQueDezCaracteres() throws Exception {
+    public void testSalvarNomeMenorQueDezCaracteresErro() throws Exception {
 
         ContaEntity conta = ContaEntity.builder()
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
                 .nome("Claudio")
                 .senha("@Neves123")
                 .build();
@@ -173,24 +234,28 @@ public class ContaServiceImplTest {
                 .numeroConta(1L)
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
                 .nome("Claudio")
                 .senha("@Neves123")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
     }
 
     @Test
-    public void testSalvarSenhaMaiorQueSeisCaracteresECaracteresEspeciais() throws Exception {
+    public void testSalvarSenhaMaiorQueSeisCaracteresECaracteresEspeciaisSucesso() throws Exception {
 
         ContaEntity conta = ContaEntity.builder()
-                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
                 .senha("@Neves123")
                 .build();
 
@@ -198,24 +263,29 @@ public class ContaServiceImplTest {
                 .numeroConta(1L)
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
                 .senha("@Neves123")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
     }
 
-    @Test(expected = ContaException.class)
-    public void testSalvarSenhaMaiorQueSeisCaracteresSemCaracteresEspeciais() throws Exception {
+    @Test(expected= ContaException.class)
+    public void testSalvarSenhaMaiorQueSeisCaracteresSemCaracteresEspeciaisErro() throws Exception {
 
         ContaEntity conta = ContaEntity.builder()
-                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
                 .senha("11111111")
                 .build();
 
@@ -223,50 +293,59 @@ public class ContaServiceImplTest {
                 .numeroConta(1L)
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
                 .senha("11111111")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
     }
 
     @Test(expected = ContaException.class)
-    public void testSalvarSenhaMenorQueSeisCaracteresComCaracteresEspeciais() throws Exception {
-
-        ContaEntity conta = ContaEntity.builder()
-                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
-                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
-                .nome("Claudio Francisco das Neves")
-                .senha("@123")
-                .build();
-
-        ContaEntity contaReturn = ContaEntity.builder()
-                .numeroConta(1L)
-                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
-                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
-                .nome("Claudio Francisco das Neves")
-                .senha("@123")
-                .build();
-
-        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
-        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
-    }
-
-    @Test
-    public void testSalvarSenhaMenorQueSeisCaracteresSemCaracteresEspeciais() throws ContaException {
+    public void testSalvarSenhaMenorQueSeisCaracteresComCaracteresEspeciaisErro() throws Exception {
 
         ContaEntity conta = ContaEntity.builder()
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
                 .documento("29328172802")
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .data("20/02/2000")
+                .rg("305965827")
                 .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
+                .senha("@#123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
+                .senha("@#123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarSenhaMenorQueSeisCaracteresSemCaracteresEspeciaisErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg("305965827")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
                 .senha("12345")
                 .build();
 
@@ -275,29 +354,268 @@ public class ContaServiceImplTest {
                 .tipoConta(TipoContaEnum.POUPANCA.ordinal())
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
                 .documento("29328172802")
-                .data(new GregorianCalendar(2000, Calendar.FEBRUARY, 3, 22, 13).getTime())
+                .rg("305965827")
+                .data("20/02/2000")
                 .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
                 .senha("12345")
                 .build();
 
         when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
         ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
-        Assert.assertNotNull(createConta);
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaFisicaRgInvalidoErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg("30596abc")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .data("20/02/2000")
+                .rg("30596abc")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarRgNuloErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg(null)
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("29328172802")
+                .rg(null)
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .nomeDaMae("Severina Maria das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaFisicaCPFNuloErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento(null)
+                .data("20/02/2000")
+                .rg("305965827")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento(null)
+                .data("20/02/2000")
+                .rg("305965827")
+                .nome("Claudio Francisco das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarTipoDeContaPoupancaNaoCompativelComDocumentoErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("12345678901234")
+                .rg("305965827")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("12345678901234")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaJuridicaComCPFErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
+                .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
+                .documento("29328172802")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
+                .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
+                .documento("29328172802")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaJuridicaComDocumentoNuloErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
+                .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
+                .documento(null)
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
+                .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
+                .documento(null)
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaJuridicaComDocumentoInvalidoErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
+                .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
+                .documento("1234abc")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
+                .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
+                .documento("1234abc")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaFisicaComCNPJErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.CORRENTE.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("12345678901234")
+                .rg("305965827")
+                .nomeDaMae("Severina Maria das Neves")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("12345678901234")
+                .rg("305965827")
+                .nomeDaMae("Severina Maria das Neves")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
+    }
+
+    @Test(expected = ContaException.class)
+    public void testSalvarContaPessoaJuridicaNaoCompativelComTipoDeContaPoupancaErro() throws Exception {
+
+        ContaEntity conta = ContaEntity.builder()
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
+                .documento("12345678901234")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .build();
+
+        ContaEntity contaReturn = ContaEntity.builder()
+                .numeroConta(1L)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .documento("12345678901234")
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@NEves123")
+                .build();
+
+        when(contaRepositorio.save(any(ContaEntity.class))).thenReturn(contaReturn);
+        ContaEntity createConta = contaServiceImpl.salvarConta(new ContaServiceAdapter(conta).getConta());
     }
 
     @Test
     public void testListarTodasContas() throws Exception {
-
-        List<Conta> contas = new ArrayList<>();
-        contas.add(Conta.builder()
-                .nome("Cláudio Francisco das Neves")
-                .serasa(600)
-                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
-                .documento("29328172802")
-                .numeroConta(1L)
-                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                .senha("@NEves123")
-                .build());
 
         List<Conta> contasReturn = new ArrayList<>();
         contasReturn.add(Conta.builder()
@@ -310,11 +628,26 @@ public class ContaServiceImplTest {
                 .senha("@NEves123")
                 .build());
         when(contaServiceImpl.listarTodos()).thenReturn(contasReturn);
-        Assert.assertEquals(contas, contasReturn);
     }
 
     @Test
     public void testBuscaPorDocumentoSucesso() throws Exception {
+
+        List<Conta> contasReturn = new ArrayList<>();
+        contasReturn.add(Conta.builder()
+                .nome("Cláudio Francisco das Neves")
+                .serasa(600)
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .documento("29328172802")
+                .numeroConta(1L)
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .senha("@NEves123")
+                .build());
+        when(contaServiceImpl.buscaPorDocumento("29328172802")).thenReturn(contasReturn);
+    }
+
+    @Test(expected = ContaException.class)
+    public void testBuscaPorDocumentoVazioFalha() throws Exception {
 
         List<Conta> contas = new ArrayList<>();
         contas.add(Conta.builder()
@@ -337,7 +670,7 @@ public class ContaServiceImplTest {
                 .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
                 .senha("@NEves123")
                 .build());
-        when(contaServiceImpl.buscaPorDocumento("29328172802")).thenReturn(contasReturn);
+        when(contaServiceImpl.buscaPorDocumento("")).thenReturn(contasReturn);
         Assert.assertEquals(contas, contasReturn);
     }
 }

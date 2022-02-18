@@ -1,70 +1,100 @@
 package br.com.gerenciadorclientesjava.services.util;
 
-import br.com.gerenciadorclientesjava.services.entities.Conta;
-import br.com.gerenciadorclientesjava.services.entities.enuns.TipoContaEnum;
 import br.com.gerenciadorclientesjava.services.entities.enuns.TipoPessoaEnum;
 import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
 public class StringUtil {
 
-
-    public static void validaSenha(Conta conta) throws ContaException {
-
-        if(conta.getSenha().length() >= 6) {
-            String pattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}";
-            conta.getSenha().matches(pattern);
-        }
-
-        throw new ContaException("Senha Invalida ou menor que 6 caracteres");
-    }
+    public static void validaSenha(String senha) throws ContaException {
 
 
-    /*public static Conta validaConta(Conta conta) throws ContaException{
-        double anos = DataUtil.validaNascimento(conta.getData());
-        if (validaSenha(conta)) {
-            if (conta.getTipoPessoa().equals(TipoPessoaEnum.JURIDICA.ordinal()) && conta.getTipoConta().equals(TipoContaEnum.CORRENTE.ordinal())) {
-                conta = ContaUtil.criarJuridica(conta);
+            if (senha.length() >= 6) {
 
-            } else if (conta.getTipoPessoa().equals(TipoPessoaEnum.FISICA.ordinal()) && anos >= 18 && (conta.getTipoConta().equals(TipoContaEnum.CORRENTE.ordinal()) || conta.getTipoConta().equals(TipoContaEnum.POUPANCA.ordinal()))) {
-                if(conta.getNome().length() > 10) {
-                    conta = ContaUtil.criarFisica(conta);
+                String pattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,}";
+                senha.matches(pattern);
 
-                }else{
-                    throw new ContaException("Nome precisa ter mais de 10 caracteres");
+                if(!senha.matches(pattern)){
+                    throw new ContaException("Senha Invalida");
                 }
+
             } else {
-                throw new ContaException("Um tipo de pessoa ou conta nao existente foi selecionado ou idade menor que 18");
+                throw new ContaException("Senha menor que 6 caracteres");
             }
-        } else {
-            throw new ContaException("Senha informada deve conter no minimo 6 caracteres e pelo menos 1 caractere maiusculo e um caractere especial");
-        }
-
-        return conta;
     }
-     */
 
-    public static void validaPessoaEConta(Integer tipoPessoa, Integer tipoConta) throws ContaException {
+
+    public static void validaRg(Integer tipoPessoa , String rg) throws ContaException {
+
         boolean check = false;
-        if((tipoPessoa == TipoPessoaEnum.FISICA.ordinal() && (tipoConta == TipoContaEnum.POUPANCA.ordinal() || tipoConta == TipoContaEnum.CORRENTE.ordinal())) || tipoPessoa == TipoPessoaEnum.JURIDICA.ordinal() && tipoConta == TipoContaEnum.CORRENTE.ordinal()){
+
+
+        if(tipoPessoa == TipoPessoaEnum.FISICA.ordinal() && rg!= null) {
+            if (rg.length() == 9) {
+
+                String pattern = "(?=.*[0-9])(?=\\S+$).{9}";
+                rg.matches(pattern);
+                check = true;
+
+                if (!rg.matches(pattern)) {
+                    throw new ContaException("RG Invalido");
+                }
+
+
+            } else {
+                throw new ContaException("RG tem que ter 9 caracteres");
+            }
+        }else if(tipoPessoa == TipoPessoaEnum.JURIDICA.ordinal() && rg == null){
             check = true;
+        }else{
+            throw new ContaException("RG não pode ser nulo");
         }
-        
-        throw new ContaException("Tipo de Conta ou Pessoa errada");
-        
     }
 
     public static void validaDocumento(String documento) throws ContaException {
         
         boolean check = false;
-        if(!documento.isEmpty() || !documento.isBlank()){
-            check = true;
+        if(documento != null) {
+            if (documento.length() == 11) {
+
+                String pattern = "(?=.*[0-9])(?=\\S+$).{11}";
+                documento.matches(pattern);
+                check = true;
+
+                if (!documento.matches(pattern)) {
+                    throw new ContaException("CPF Invalido");
+                }
+
+            } else if (documento.length() == 14) {
+
+                String pattern = "(?=.*[0-9])(?=\\S+$).{14}";
+                documento.matches(pattern);
+                check = true;
+
+                if (!documento.matches(pattern)) {
+
+                    throw new ContaException("CNPJ Invalido");
+
+                }
+
+            } else {
+
+                throw new ContaException("Documento deve ter 11 ou 14 digitos");
+
+            }
+        }else{
+
+            throw new ContaException("Documento não pode ser nulo");
+
         }
-        
-        throw new ContaException("Documento não deve ser nulo ou vazio");
+
+    }
+
+    public static void validaNomeComDezCaracteres(Integer tipoPessoa, String nome) throws ContaException {
+        boolean check = false;
+        if((tipoPessoa == TipoPessoaEnum.FISICA.ordinal() && nome.length() >= 10) || tipoPessoa == TipoPessoaEnum.JURIDICA.ordinal()){
+            check = true;
+        }else{
+            throw new ContaException("Nomes Proprios precisam ter mais de 10 caracteres");
+        }
     }
 }

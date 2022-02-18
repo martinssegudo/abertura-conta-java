@@ -1,5 +1,6 @@
 package br.com.gerenciadorclientesjava.apis.entities;
 
+import br.com.gerenciadorclientesjava.services.entities.enuns.TipoPessoaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +17,11 @@ import java.util.Date;
 public class ContaFisicaAPI {
 
             private Long numeroConta;
-            private Integer tipoPessoa;
+            private Integer tipoPessoa = TipoPessoaEnum.FISICA.ordinal();
             private String nomeCompleto;
 
             @DateTimeFormat(pattern = "dd/MM/yyyy")
-            private Date dataNascimento;
+            private String dataNascimento;
 
             private Integer tipoConta;
             private String cpf;

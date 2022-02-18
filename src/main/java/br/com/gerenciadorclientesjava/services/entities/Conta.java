@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -16,7 +17,10 @@ public class Conta {
             private Long numeroConta;
             private Integer tipoPessoa;
             private String nome;
-            private Date data;
+
+            @DateTimeFormat(pattern = "dd/MM/yyyy")
+            private String data;
+
             private Integer tipoConta;
             private String documento;
             private String rg;

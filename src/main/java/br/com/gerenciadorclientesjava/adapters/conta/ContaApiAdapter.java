@@ -35,6 +35,7 @@ public class ContaApiAdapter {
                 .tipoPessoa(conta.getTipoPessoa())
                 .nome(conta.getNome())
                 .data(conta.getData())
+                .senha(conta.getSenha())
                 .tipoConta(conta.getTipoConta())
                 .documento(conta.getDocumento())
                 .serasa(conta.getSerasa())

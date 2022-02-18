@@ -3,11 +3,11 @@ package br.com.gerenciadorclientesjava.apis.contracts;
 import br.com.gerenciadorclientesjava.apis.entities.ContaAPI;
 import br.com.gerenciadorclientesjava.apis.entities.ContaFisicaAPI;
 import br.com.gerenciadorclientesjava.apis.entities.ContaJuridicaAPI;
-import br.com.gerenciadorclientesjava.apis.entities.LoginAPI;
 import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.el.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public interface ApiConta {
             @ApiResponse(code = 406, message = "Quando uma regra for quebrada"),
             @ApiResponse(code = 500, message = "Retornará uma mensagem amigável para o usuário"),
     })
-    ResponseEntity<ContaFisicaAPI> salvarContaFisica(ContaFisicaAPI novaConta) throws ContaException;
+    ResponseEntity<ContaFisicaAPI> salvarContaFisica(ContaFisicaAPI novaConta) throws ContaException , ParseException, java.text.ParseException;
 
     @ApiOperation(value = "Mostra uma conta pelo numero do documento")
     @ApiResponses(value = {
