@@ -71,6 +71,7 @@ public class ApiContaImpl implements ApiConta {
                         .build());
             }
         }
+
         try {
             ContaServiceAdapter adapter = new ContaServiceAdapter(contaJuridicaAPI);
             contaService.salvarConta(adapter.getConta());

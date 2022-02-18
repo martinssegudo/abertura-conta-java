@@ -24,6 +24,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -196,6 +198,124 @@ public class ApiContaImplTest {
         ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
         when(contaService.login(conta.getDocumento(),conta.getSenha())).thenReturn(contaReturn);
         ResponseEntity<ContaAPI> result = apiContaImpl.login(conta.getDocumento(),conta.getSenha());
+        Assert.assertEquals(result.getStatusCode(), HttpStatus.OK);
+    }
+
+    @Test
+    public void testApiLoginFalha() throws ContaException, ParseException {
+
+        ContaException exception = new ContaException("Erro");
+
+        Conta conta = Conta.builder()
+                .documento("29328172800")
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves000")
+                .serasa(600)
+                .nomeDaMae("Severina Maria das Neves")
+                .nomeDoPai("Manoel Franco de Alquino")
+                .rg("305965827")
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .build();
+
+        Conta contaReturn = Conta.builder()
+                .documento("29328172802")
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .serasa(600)
+                .nomeDaMae("Severina Maria das Neves")
+                .nomeDoPai("Manoel Franco de Alquino")
+                .rg("305965827")
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .build();
+
+        ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
+        when(contaService.login("111111","222222")).thenReturn(contaReturn);
+        ResponseEntity<ContaAPI> result = ResponseEntity.status(406).body(ContaAPI.builder()
+                .erro(exception.getMessage())
+                .build());
+        Assert.assertEquals(result.getStatusCode(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @Test
+    public void testApiBuscaDocumentoFalha() throws ContaException, ParseException {
+
+        Conta conta = Conta.builder()
+                .documento("29328172802")
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves000")
+                .serasa(600)
+                .nomeDaMae("Severina Maria das Neves")
+                .nomeDoPai("Manoel Franco de Alquino")
+                .rg("305965827")
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .build();
+
+        Conta contaReturn = Conta.builder()
+                .documento("29328172802")
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .serasa(600)
+                .nomeDaMae("Severina Maria das Neves")
+                .nomeDoPai("Manoel Franco de Alquino")
+                .rg("305965827")
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .build();
+
+        List<Conta> contas = new ArrayList<>();
+        contas.add(contaReturn);
+
+        ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
+        when(contaService.buscaPorDocumento("293281")).thenReturn(contas);
+        ResponseEntity<List<ContaAPI>> result = apiContaImpl.contaPorDocumento(contaAPI.getDocumento());
+        Assert.assertEquals(result.getStatusCode(), HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void testApiBuscaDocumentoSucesso() throws ContaException, ParseException {
+
+
+        ContaException exception = new ContaException("Erro");
+
+        Conta conta = Conta.builder()
+                .documento("29328172800")
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves000")
+                .serasa(600)
+                .nomeDaMae("Severina Maria das Neves")
+                .nomeDoPai("Manoel Franco de Alquino")
+                .rg("305965827")
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .build();
+
+        Conta contaReturn = Conta.builder()
+                .documento("29328172802")
+                .tipoConta(TipoContaEnum.POUPANCA.ordinal())
+                .data("20/02/2000")
+                .nome("Claudio Francisco das Neves")
+                .senha("@Neves123")
+                .serasa(600)
+                .nomeDaMae("Severina Maria das Neves")
+                .nomeDoPai("Manoel Franco de Alquino")
+                .rg("305965827")
+                .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
+                .build();
+
+        List<Conta> contas = new ArrayList<>();
+        contas.add(contaReturn);
+
+        ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
+        when(contaService.buscaPorDocumento("29328172800")).thenReturn(contas);
+        ResponseEntity<List<ContaAPI>> result = apiContaImpl.contaPorDocumento(contaAPI.getDocumento());
         Assert.assertEquals(result.getStatusCode(), HttpStatus.OK);
     }
 }
