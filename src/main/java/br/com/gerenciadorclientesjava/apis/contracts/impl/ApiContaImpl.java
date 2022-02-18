@@ -47,8 +47,14 @@ public class ApiContaImpl implements ApiConta {
                         .build());
             }
         }
-        ContaServiceAdapter adapter = new ContaServiceAdapter(contaFisicaAPI);
-        contaService.salvarConta(adapter.getConta());
+        try {
+            ContaServiceAdapter adapter = new ContaServiceAdapter(contaFisicaAPI);
+            contaService.salvarConta(adapter.getConta());
+        }catch(ContaException e){
+            ResponseEntity.status(406).body(ContaFisicaAPI.builder()
+                    .erro(e.getMessage())
+                    .build());
+        }
         return ResponseEntity.ok(contaFisicaAPI);
     }
 
@@ -65,8 +71,14 @@ public class ApiContaImpl implements ApiConta {
                         .build());
             }
         }
-        ContaServiceAdapter adapter = new ContaServiceAdapter(contaJuridicaAPI);
-        contaService.salvarConta(adapter.getConta());
+        try {
+            ContaServiceAdapter adapter = new ContaServiceAdapter(contaJuridicaAPI);
+            contaService.salvarConta(adapter.getConta());
+        }catch(ContaException e){
+           return ResponseEntity.status(406).body(ContaJuridicaAPI.builder()
+                   .erro(e.getMessage())
+                   .build());
+        }
         return ResponseEntity.ok(contaJuridicaAPI);
     }
 
