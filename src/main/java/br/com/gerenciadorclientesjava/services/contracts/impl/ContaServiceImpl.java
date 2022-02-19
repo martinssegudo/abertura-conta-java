@@ -74,15 +74,15 @@ public class ContaServiceImpl implements ContaService {
     }
 
     @Override
-    public Conta login(String documento, String senha) throws ContaException {
+    public Conta login(String documento, String senha, Integer tipoConta) throws ContaException {
 
         StringUtil.validaDocumento(documento);
         StringUtil.validaSenha(senha);
 
-        if(contaRepositorio.findByDocumentoESenha(documento, senha) == null){
+        if(contaRepositorio.findByDocumentoESenha(documento, senha, tipoConta) == null){
             throw new ContaException("Conta Inexistente");
         }
 
-        return new ContaServiceAdapter(contaRepositorio.findByDocumentoESenha(documento, senha)).getConta();
+        return new ContaServiceAdapter(contaRepositorio.findByDocumentoESenha(documento, senha, tipoConta)).getConta();
     }
 }

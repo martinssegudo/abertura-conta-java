@@ -47,6 +47,7 @@ public class ApiContaImpl implements ApiConta {
                         .build());
             }
         }
+
         try {
             ContaServiceAdapter adapter = new ContaServiceAdapter(contaFisicaAPI);
             contaService.salvarConta(adapter.getConta());
@@ -99,12 +100,12 @@ public class ApiContaImpl implements ApiConta {
     }
 
 
-    @GetMapping(value = "/login/{documento}/{senha}")
+    @GetMapping(value = "/login/{documento}/{senha}/{tipoConta}")
     @ResponseBody
     @Override
-    public ResponseEntity<ContaAPI> login(@PathVariable String documento, @PathVariable String senha) throws ContaException {
+    public ResponseEntity<ContaAPI> login(@PathVariable String documento, @PathVariable String senha, @PathVariable Integer tipoConta) throws ContaException {
 
-        Conta conta = contaService.login(documento, senha);
+        Conta conta = contaService.login(documento, senha, tipoConta);
         if(new ContaApiAdapter(conta).getContaAPI().equals("")){
             Conta.builder()
                     .erro("Não existe conta cadastrada para o documento informado")

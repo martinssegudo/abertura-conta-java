@@ -196,8 +196,8 @@ public class ApiContaImplTest {
                 .build();
 
         ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
-        when(contaService.login(conta.getDocumento(),conta.getSenha())).thenReturn(contaReturn);
-        ResponseEntity<ContaAPI> result = apiContaImpl.login(conta.getDocumento(),conta.getSenha());
+        when(contaService.login(conta.getDocumento(),conta.getSenha(),conta.getTipoConta())).thenReturn(contaReturn);
+        ResponseEntity<ContaAPI> result = apiContaImpl.login(conta.getDocumento(),conta.getSenha(),conta.getTipoConta());
         Assert.assertEquals(result.getStatusCode(), HttpStatus.OK);
     }
 
@@ -233,7 +233,7 @@ public class ApiContaImplTest {
                 .build();
 
         ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
-        when(contaService.login("111111","222222")).thenReturn(contaReturn);
+        when(contaService.login("111111","222222", TipoContaEnum.POUPANCA.ordinal())).thenReturn(contaReturn);
         ResponseEntity<ContaAPI> result = ResponseEntity.status(406).body(ContaAPI.builder()
                 .erro(exception.getMessage())
                 .build());

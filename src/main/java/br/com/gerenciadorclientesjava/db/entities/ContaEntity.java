@@ -46,7 +46,6 @@ public class ContaEntity {
     @Column(name="ID_TIPO_CONTA")
     private Integer tipoConta;
 
-
     @Column(name="DS_DOCUMENTO")
     private String documento;
 

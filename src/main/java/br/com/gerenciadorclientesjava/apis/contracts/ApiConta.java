@@ -46,5 +46,5 @@ public interface ApiConta {
             @ApiResponse(code = 403, message = "Você não tem permissão para acessar esta conta"),
             @ApiResponse(code = 500, message = "Retornará uma mensagem amigável para o usuário"),
     })
-    ResponseEntity<ContaAPI> login(String documento, String senha) throws ContaException;
+    ResponseEntity<ContaAPI> login(String documento, String senha, Integer tipoConta) throws ContaException;
 }
