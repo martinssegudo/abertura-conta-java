@@ -1,6 +1,8 @@
 package br.com.gerenciadorclientesjava.adapters.conta;
 
+import br.com.gerenciadorclientesjava.db.entities.ClienteEntity;
 import br.com.gerenciadorclientesjava.db.entities.ContaEntity;
+import br.com.gerenciadorclientesjava.db.entities.LoginEntity;
 import br.com.gerenciadorclientesjava.services.entities.Conta;
 import lombok.Data;
 
@@ -16,16 +18,20 @@ public class ContaEntityAdapter {
     private ContaEntity converteContaEmContaEntity(Conta conta) {
         return   ContaEntity.builder()
                 .numeroConta(conta.getNumeroConta())
-                .tipoPessoa(conta.getTipoPessoa())
-                .nome(conta.getNome())
-                .data(conta.getData())
                 .tipoConta(conta.getTipoConta())
-                .documento(conta.getDocumento())
-                .rg(conta.getRg())
-                .serasa(conta.getSerasa())
-                .nomeDoPai(conta.getNomeDoPai())
-                .nomeDaMae(conta.getNomeDaMae())
-                .senha(conta.getSenha())
+                .clienteEntity(ClienteEntity.builder()
+                        .tipoCliente(conta.getCliente().getTipoPessoa())
+                        .cliente(conta.getCliente().getNome())
+                        .data(conta.getCliente().getData())
+                        .documento(conta.getCliente().getDocumento())
+                        .rg(conta.getCliente().getRg())
+                        .serasa(conta.getCliente().getSerasa())
+                        .nomeDaMae(conta.getCliente().getNomeDaMae())
+                        .nomeDoPai(conta.getCliente().getNomeDoPai())
+                        .loginEntity(LoginEntity.builder()
+                                .senha(conta.getCliente().getLogin().getSenha())
+                                .build())
+                        .build())
                 .build();
     }
 }

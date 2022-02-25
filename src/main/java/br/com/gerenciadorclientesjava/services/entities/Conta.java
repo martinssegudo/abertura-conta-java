@@ -15,18 +15,7 @@ import java.util.Date;
 public class Conta {
 
             private Long numeroConta;
-            private Integer tipoPessoa;
-            private String nome;
-
-            @DateTimeFormat(pattern = "dd/MM/yyyy")
-            private String data;
-
-            private Integer tipoConta;
-            private String documento;
-            private String rg;
-            private Integer serasa;
-            private String nomeDoPai;
-            private String nomeDaMae;
-            private String senha;
+            private String tipoConta;
+            private Cliente cliente;
             private String erro;
 }

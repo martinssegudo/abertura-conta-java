@@ -6,11 +6,11 @@ import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
 
 public class ContaUtil {
 
-    public static void validaPessoaEConta(String documento, Integer tipoPessoa, Integer tipoConta) throws ContaException {
+    public static void validaPessoaEConta(String documento, Integer tipoPessoa, String tipoConta) throws ContaException {
 
         boolean check = false;
 
-        if (documento.length() == 11 && tipoPessoa == TipoPessoaEnum.FISICA.ordinal() && (tipoConta == TipoContaEnum.CORRENTE.ordinal() || tipoConta == TipoContaEnum.POUPANCA.ordinal()) || (documento.length() == 14 && tipoPessoa == TipoPessoaEnum.JURIDICA.ordinal() && tipoConta == TipoContaEnum.CORRENTE.ordinal())) {
+        if (documento.length() == 11 && tipoPessoa == TipoPessoaEnum.FISICA.ordinal() && (tipoConta.equals(String.valueOf(TipoContaEnum.CORRENTE.ordinal())) || tipoConta.equals(String.valueOf(TipoContaEnum.POUPANCA.ordinal()))) || documento.length() == 14 && tipoPessoa == TipoPessoaEnum.JURIDICA.ordinal() && tipoConta.equals(String.valueOf(TipoContaEnum.CORRENTE.ordinal()))) {
                 check = true;
         }else {
 

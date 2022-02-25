@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ContaAPI{
+public class ContaPessoaFisicaAPI{
 
     private Long numeroConta;
     private String tipoConta;
-    private ClienteAPI clienteAPI;
+    private ClientePessoaFisicaAPI clientePessoaFisicaAPI;
     private String erro;
 }

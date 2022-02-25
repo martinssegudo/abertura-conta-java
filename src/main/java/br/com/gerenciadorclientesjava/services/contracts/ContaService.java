@@ -1,6 +1,5 @@
 package br.com.gerenciadorclientesjava.services.contracts;
 
-import br.com.gerenciadorclientesjava.db.entities.ContaEntity;
 import br.com.gerenciadorclientesjava.services.entities.Conta;
 import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
 
@@ -8,11 +7,13 @@ import java.util.List;
 
 public interface ContaService {
 
-    ContaEntity salvarConta(Conta conta) throws ContaException;
+    Conta salvarConta(Conta conta) throws ContaException;
 
     List<Conta> listarTodos();
 
     List<Conta> buscaPorDocumento(String documento) throws ContaException;
 
-    Conta login(String documento, String senha, Integer tipoConta) throws ContaException;
+    void verificaDuplicados(String documento, String tipoConta) throws ContaException;
+
+    Conta login(String documento, String senha, String tipoConta) throws ContaException;
 }

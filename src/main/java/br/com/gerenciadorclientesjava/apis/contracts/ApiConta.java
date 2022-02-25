@@ -1,36 +1,36 @@
 package br.com.gerenciadorclientesjava.apis.contracts;
 
 import br.com.gerenciadorclientesjava.apis.entities.ContaAPI;
-import br.com.gerenciadorclientesjava.apis.entities.ContaFisicaAPI;
-import br.com.gerenciadorclientesjava.apis.entities.ContaJuridicaAPI;
+import br.com.gerenciadorclientesjava.apis.entities.ContaPessoaFisicaAPI;
+import br.com.gerenciadorclientesjava.apis.entities.ContaPessoaJuridicaAPI;
 import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.el.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface ApiConta {
 
-    @ApiOperation(value = "Salva uma conta de pessoa Jurídica")
+    @ApiOperation(value = "Salva uma conta pessoa fisica")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna uma mensagem se salvou o valor"),
             @ApiResponse(code = 403, message = "Você não tem permissão para acessar este recurso"),
             @ApiResponse(code = 406, message = "Quando uma regra for quebrada"),
             @ApiResponse(code = 500, message = "Retornará uma mensagem amigável para o usuário"),
     })
-    ResponseEntity<ContaJuridicaAPI> salvarContaJuridica(ContaJuridicaAPI novaConta) throws ContaException;
+    ResponseEntity<ContaPessoaFisicaAPI> salvarContaPessoaFisica(ContaPessoaFisicaAPI novaConta) throws ContaException;
 
-    @ApiOperation(value = "Salva uma conta de Pessoa Fisica")
+    @ApiOperation(value = "Salva uma conta pessoa juridica")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Retorna uma mensagem se salvou o valor"),
             @ApiResponse(code = 403, message = "Você não tem permissão para acessar este recurso"),
             @ApiResponse(code = 406, message = "Quando uma regra for quebrada"),
             @ApiResponse(code = 500, message = "Retornará uma mensagem amigável para o usuário"),
     })
-    ResponseEntity<ContaFisicaAPI> salvarContaFisica(ContaFisicaAPI novaConta) throws ContaException , ParseException, java.text.ParseException;
+    ResponseEntity<ContaPessoaJuridicaAPI> salvarContaPessoaJuridica(ContaPessoaJuridicaAPI novaConta) throws ContaException;
+
 
     @ApiOperation(value = "Mostra uma conta pelo numero do documento")
     @ApiResponses(value = {
@@ -46,5 +46,5 @@ public interface ApiConta {
             @ApiResponse(code = 403, message = "Você não tem permissão para acessar esta conta"),
             @ApiResponse(code = 500, message = "Retornará uma mensagem amigável para o usuário"),
     })
-    ResponseEntity<ContaAPI> login(String documento, String senha, Integer tipoConta) throws ContaException;
+    ResponseEntity<ContaAPI> login(String documento, String senha, String tipoConta) throws ContaException;
 }

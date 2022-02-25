@@ -5,14 +5,15 @@ import br.com.gerenciadorclientesjava.adapters.conta.ContaServiceAdapter;
 import br.com.gerenciadorclientesjava.apis.contracts.ApiConta;
 import br.com.gerenciadorclientesjava.apis.entities.*;
 import br.com.gerenciadorclientesjava.services.contracts.ContaService;
+import br.com.gerenciadorclientesjava.services.entities.Cliente;
 import br.com.gerenciadorclientesjava.services.entities.Conta;
+import br.com.gerenciadorclientesjava.services.entities.Login;
 import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,85 +36,99 @@ public class ApiContaImpl implements ApiConta {
    // }
 
 
-    @PostMapping(value = "/salvarfisica")
-    @Override
-    public ResponseEntity<ContaFisicaAPI> salvarContaFisica(@RequestBody ContaFisicaAPI contaFisicaAPI) throws ContaException{
 
-        List<Conta> contas = contaService.listarTodos();
-        for (Conta conta: contas) {
-            if (conta.getDocumento().equals(contaFisicaAPI.getCpf()) && conta.getTipoConta().equals(contaFisicaAPI.getTipoConta())) {
-                return ResponseEntity.status(406).body(ContaFisicaAPI.builder()
-                        .erro("Conta Duplicada favor digitar outro CPF ou Escolher outro tipo de conta")
-                        .build());
-            }
-        }
+
+    @PostMapping(value = "/salvarcontapessoafisica")
+    @Override
+    public ResponseEntity<ContaPessoaFisicaAPI> salvarContaPessoaFisica(@RequestBody ContaPessoaFisicaAPI contaAPI) throws ContaException {
+
 
         try {
-            ContaServiceAdapter adapter = new ContaServiceAdapter(contaFisicaAPI);
+            contaService.verificaDuplicados(contaAPI.getClientePessoaFisicaAPI().getCpf(), contaAPI.getTipoConta());
+            ContaServiceAdapter adapter = new ContaServiceAdapter(contaAPI);
+            System.out.print(adapter.getConta());
             contaService.salvarConta(adapter.getConta());
         }catch(ContaException e){
-            ResponseEntity.status(406).body(ContaFisicaAPI.builder()
-                    .erro(e.getMessage())
-                    .build());
-        }
-        return ResponseEntity.ok(contaFisicaAPI);
-    }
-
-
-    @PostMapping(value = "/salvarjuridica")
-    @Override
-    public ResponseEntity<ContaJuridicaAPI> salvarContaJuridica(@RequestBody ContaJuridicaAPI contaJuridicaAPI) throws ContaException {
-
-        List<Conta> contas = contaService.listarTodos();
-        for (Conta conta: contas) {
-            if (conta.getDocumento().equals(contaJuridicaAPI.getCnpj()) && conta.getTipoConta().equals(contaJuridicaAPI.getTipoConta())) {
-                return ResponseEntity.status(406).body(ContaJuridicaAPI.builder()
-                        .erro("Conta Duplicada favor digitar outro CNPJ")
-                        .build());
-            }
-        }
-
-        try {
-            ContaServiceAdapter adapter = new ContaServiceAdapter(contaJuridicaAPI);
-            contaService.salvarConta(adapter.getConta());
-        }catch(ContaException e){
-           return ResponseEntity.status(406).body(ContaJuridicaAPI.builder()
+           return ResponseEntity.status(406).body(ContaPessoaFisicaAPI.builder()
                    .erro(e.getMessage())
                    .build());
         }
-        return ResponseEntity.ok(contaJuridicaAPI);
+        return ResponseEntity.ok(contaAPI);
+    }
+
+    @PostMapping(value = "/salvarcontapessoajuridica")
+    @Override
+    public ResponseEntity<ContaPessoaJuridicaAPI> salvarContaPessoaJuridica(@RequestBody ContaPessoaJuridicaAPI contaAPI) throws ContaException {
+
+
+        try {
+            contaService.verificaDuplicados(contaAPI.getClientePessoaJuridicaAPI().getCnpj(), contaAPI.getTipoConta());
+            ContaServiceAdapter adapter = new ContaServiceAdapter(contaAPI);
+            System.out.print(adapter.getConta());
+            contaService.salvarConta(adapter.getConta());
+        }catch(ContaException e){
+            return ResponseEntity.status(406).body(ContaPessoaJuridicaAPI.builder()
+                    .erro(e.getMessage())
+                    .build());
+        }
+        return ResponseEntity.ok(contaAPI);
     }
 
     @GetMapping(value = "/{documento}")
     @Override
     public ResponseEntity<List<ContaAPI>> contaPorDocumento(@PathVariable String documento) throws ContaException {
 
-               List<Conta> conta = this.contaService.buscaPorDocumento(documento);
-               if(new ContaApiAdapter(conta).getContasAPI().isEmpty()){
-                   conta.add(Conta.builder()
-                           .erro("Não existe conta cadastrada para o documento informado")
+       List<Conta> conta = new ArrayList<>();
+
+       try {
+
+           conta = this.contaService.buscaPorDocumento(documento);
+
+       }catch(ContaException e){
+           conta.add(Conta.builder()
+                           .cliente(Cliente.builder()
+                                   .tipoPessoa(null)
+                                   .login(Login.builder()
+                                           .senha("")
+                                           .build())
+                                   .build())
+                           .erro("Conta Inexistente")
                            .build());
-                   return ResponseEntity.status(403).body(new ContaApiAdapter(conta).getContasAPI());
-               }
+           return ResponseEntity.status(403).body(new ContaApiAdapter(conta).getContasAPI());
+       }
 
         return ResponseEntity.ok(new ContaApiAdapter(conta).getContasAPI());
+
+
     }
 
 
     @GetMapping(value = "/login/{documento}/{senha}/{tipoConta}")
     @ResponseBody
     @Override
-    public ResponseEntity<ContaAPI> login(@PathVariable String documento, @PathVariable String senha, @PathVariable Integer tipoConta) throws ContaException {
+    public ResponseEntity<ContaAPI> login(@PathVariable String documento, @PathVariable String senha, @PathVariable String tipoConta) throws ContaException {
 
-        Conta conta = contaService.login(documento, senha, tipoConta);
-        if(new ContaApiAdapter(conta).getContaAPI().equals("")){
-            Conta.builder()
-                    .erro("Não existe conta cadastrada para o documento informado")
+       Conta conta;
+
+        try {
+
+            conta = contaService.login(documento, senha, tipoConta);
+
+        }catch(ContaException e){
+           conta = Conta.builder()
+                    .cliente(Cliente.builder()
+                            .tipoPessoa(null)
+                            .login(Login.builder()
+                                    .senha("")
+                                    .build())
+                            .build())
+                    .erro("Conta Inexistente")
                     .build();
             return ResponseEntity.status(403).body(new ContaApiAdapter(conta).getContaAPI());
         }
 
         return ResponseEntity.ok(new ContaApiAdapter(conta).getContaAPI());
 
-   }
+
+    }
 }

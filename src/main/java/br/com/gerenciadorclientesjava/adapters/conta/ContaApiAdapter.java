@@ -1,7 +1,11 @@
 package br.com.gerenciadorclientesjava.adapters.conta;
 
+import br.com.gerenciadorclientesjava.apis.entities.ClienteAPI;
 import br.com.gerenciadorclientesjava.apis.entities.ContaAPI;
+import br.com.gerenciadorclientesjava.apis.entities.LoginAPI;
+import br.com.gerenciadorclientesjava.services.entities.Cliente;
 import br.com.gerenciadorclientesjava.services.entities.Conta;
+import br.com.gerenciadorclientesjava.services.entities.Login;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -32,14 +36,20 @@ public class ContaApiAdapter {
     private ContaAPI convertContaParaContaAPI(Conta conta) {
         return ContaAPI.builder()
                 .numeroConta(conta.getNumeroConta())
-                .tipoPessoa(conta.getTipoPessoa())
-                .nome(conta.getNome())
-                .data(conta.getData())
-                .senha(conta.getSenha())
                 .tipoConta(conta.getTipoConta())
-                .documento(conta.getDocumento())
-                .serasa(conta.getSerasa())
-                .erro(conta.getErro())
+                .clienteAPI(ClienteAPI.builder()
+                        .tipoCliente(conta.getCliente().getTipoPessoa())
+                        .cliente(conta.getCliente().getNome())
+                        .data(conta.getCliente().getData())
+                        .documento(conta.getCliente().getDocumento())
+                        .rg(conta.getCliente().getRg())
+                        .nomeDaMae(conta.getCliente().getNomeDaMae())
+                        .nomeDoPai(conta.getCliente().getNomeDoPai())
+                        .serasa(conta.getCliente().getSerasa())
+                        .login(LoginAPI.builder()
+                                .senha(conta.getCliente().getLogin().getSenha())
+                                .build())
+                        .build())
                 .build();
     }
 }
