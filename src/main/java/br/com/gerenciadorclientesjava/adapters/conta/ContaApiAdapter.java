@@ -3,9 +3,7 @@ package br.com.gerenciadorclientesjava.adapters.conta;
 import br.com.gerenciadorclientesjava.apis.entities.ClienteAPI;
 import br.com.gerenciadorclientesjava.apis.entities.ContaAPI;
 import br.com.gerenciadorclientesjava.apis.entities.LoginAPI;
-import br.com.gerenciadorclientesjava.services.entities.Cliente;
 import br.com.gerenciadorclientesjava.services.entities.Conta;
-import br.com.gerenciadorclientesjava.services.entities.Login;
 import lombok.Data;
 
 import java.util.ArrayList;

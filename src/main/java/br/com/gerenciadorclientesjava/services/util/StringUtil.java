@@ -1,12 +1,11 @@
 package br.com.gerenciadorclientesjava.services.util;
 
 import br.com.gerenciadorclientesjava.services.entities.enuns.TipoPessoaEnum;
-import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
+import br.com.gerenciadorclientesjava.services.exceptions.*;
 
 public class StringUtil {
 
-    public static void validaSenha(String senha) throws ContaException {
-
+    public static void validaSenha(String senha) throws SenhaInvalidaException, SenhaMenorSeisCaracteresException {
 
             if (senha.length() >= 6) {
 
@@ -14,19 +13,18 @@ public class StringUtil {
                 senha.matches(pattern);
 
                 if(!senha.matches(pattern)){
-                    throw new ContaException("Senha Invalida");
+                    throw new SenhaInvalidaException();
                 }
 
             } else {
-                throw new ContaException("Senha menor que 6 caracteres");
+                throw new SenhaMenorSeisCaracteresException();
             }
     }
 
 
-    public static void validaRg(Integer tipoPessoa , String rg) throws ContaException {
+    public static void validaRg(Integer tipoPessoa , String rg) throws RgDiferenteNoveCaracteresException, RgInvalidoException, RgNuloException {
 
         boolean check = false;
-
 
         if(tipoPessoa == TipoPessoaEnum.FISICA.ordinal() && rg!= null) {
             if (rg.length() == 9) {
@@ -36,21 +34,23 @@ public class StringUtil {
                 check = true;
 
                 if (!rg.matches(pattern)) {
-                    throw new ContaException("RG Invalido");
+
+                    throw new RgInvalidoException();
                 }
 
-
             } else {
-                throw new ContaException("RG tem que ter 9 caracteres");
+
+                throw new RgDiferenteNoveCaracteresException();
             }
+
         }else if(tipoPessoa == TipoPessoaEnum.JURIDICA.ordinal() && rg == null){
             check = true;
         }else{
-            throw new ContaException("RG não pode ser nulo");
+            throw new RgNuloException();
         }
     }
 
-    public static void validaDocumento(String documento) throws ContaException {
+    public static void validaDocumento(String documento) throws CPFException, CNPJException, DocumentoException, DocumentoNuloException {
         
         boolean check = false;
         if(documento != null) {
@@ -61,7 +61,7 @@ public class StringUtil {
                 check = true;
 
                 if (!documento.matches(pattern)) {
-                    throw new ContaException("CPF Invalido");
+                    throw new CPFException();
                 }
 
             } else if (documento.length() == 14) {
@@ -72,29 +72,29 @@ public class StringUtil {
 
                 if (!documento.matches(pattern)) {
 
-                    throw new ContaException("CNPJ Invalido");
+                    throw new CNPJException();
 
                 }
 
             } else {
 
-                throw new ContaException("Documento deve ter 11 ou 14 digitos");
+                throw new DocumentoException();
 
             }
         }else{
 
-            throw new ContaException("Documento não pode ser nulo");
+            throw new DocumentoNuloException();
 
         }
 
     }
 
-    public static void validaNomeComDezCaracteres(Integer tipoPessoa, String nome) throws ContaException {
+    public static void validaNomeComDezCaracteres(Integer tipoPessoa, String nome) throws NomeException {
         boolean check = false;
         if((tipoPessoa == TipoPessoaEnum.FISICA.ordinal() && nome.length() >= 10) || tipoPessoa == TipoPessoaEnum.JURIDICA.ordinal()){
             check = true;
         }else{
-            throw new ContaException("Nomes Proprios precisam ter mais de 10 caracteres");
+            throw new NomeException();
         }
     }
 }

@@ -1,18 +1,14 @@
 package br.com.gerenciadorclientesjava.services.entities;
 
-import br.com.gerenciadorclientesjava.db.entities.ClienteEntity;
-import br.com.gerenciadorclientesjava.db.entities.ContaEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Login {
 
     private Long id;
     private String senha;
+
 }

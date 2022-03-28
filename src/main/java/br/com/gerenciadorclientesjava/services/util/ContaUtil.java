@@ -2,11 +2,11 @@ package br.com.gerenciadorclientesjava.services.util;
 
 import br.com.gerenciadorclientesjava.services.entities.enuns.TipoContaEnum;
 import br.com.gerenciadorclientesjava.services.entities.enuns.TipoPessoaEnum;
-import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
+import br.com.gerenciadorclientesjava.services.exceptions.ValidaDocumentoPessoaContaException;
 
 public class ContaUtil {
 
-    public static void validaPessoaEConta(String documento, Integer tipoPessoa, String tipoConta) throws ContaException {
+    public static void validaPessoaEConta(String documento, Integer tipoPessoa, String tipoConta) throws ValidaDocumentoPessoaContaException {
 
         boolean check = false;
 
@@ -14,9 +14,9 @@ public class ContaUtil {
                 check = true;
         }else {
 
-            throw new ContaException("Pessoa ou Conta Incorreta para esse Documento");
-
+            throw new ValidaDocumentoPessoaContaException();
         }
+
 
     }
 

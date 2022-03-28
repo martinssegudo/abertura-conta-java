@@ -1,9 +1,6 @@
 package br.com.gerenciadorclientesjava.db.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,8 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import javax.persistence.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name="TB_CLIENTE")
@@ -55,4 +52,5 @@ public class ClienteEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     private LoginEntity loginEntity;
+
 }

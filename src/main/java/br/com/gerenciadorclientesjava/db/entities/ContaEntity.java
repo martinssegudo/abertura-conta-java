@@ -1,17 +1,14 @@
 package br.com.gerenciadorclientesjava.db.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name="TB_CONTA")
@@ -36,7 +33,5 @@ public class ContaEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     private ClienteEntity clienteEntity;
-
-    private String erro;
 
 }

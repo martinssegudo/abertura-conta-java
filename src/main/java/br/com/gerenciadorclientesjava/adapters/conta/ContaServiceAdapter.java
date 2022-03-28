@@ -16,61 +16,42 @@ import java.util.List;
 public class ContaServiceAdapter {
 
     private Conta conta;
-    private List<Conta> contas;
+    private List<Conta> contasEntity;
 
 
-    public ContaServiceAdapter(ContaAPI contaAPI) {
-        this.conta = convertContaApiEmConta(contaAPI);
-    }
     public ContaServiceAdapter(ContaPessoaJuridicaAPI contaAPI) {
         this.conta = convertContaPessoaJuridicaApiEmConta(contaAPI);
     }
+
     public ContaServiceAdapter(ContaPessoaFisicaAPI contaAPI) {
         this.conta = convertContaPessoaFisicaApiEmConta(contaAPI);
     }
-
 
     public ContaServiceAdapter(ContaEntity contaEntity) {
         setConta(convertContaEntityEmConta(contaEntity));
     }
 
-    public ContaServiceAdapter(List<ContaEntity> contaEntities) {
-        setContas(convertListEntityEmListConta(contaEntities));
+    public ContaServiceAdapter(List<ContaEntity> contas) {
+        this.contasEntity = convertListEntityEmListConta(contas);
     }
+
 
     private List<Conta> convertListEntityEmListConta(List<ContaEntity> contaEntityList) {
-        contas = new ArrayList<>();
+        contasEntity = new ArrayList<>();
         for (ContaEntity contaEntity : contaEntityList) {
-            contas.add(convertContaEntityEmConta(contaEntity));
+            contasEntity.add(convertContaEntityEmConta(contaEntity));
         }
-        return contas;
+        return contasEntity;
     }
 
-    private Conta convertContaApiEmConta(ContaAPI contaApi) {
-        return Conta.builder()
-                .numeroConta(contaApi.getNumeroConta())
-                .tipoConta(contaApi.getTipoConta())
-                .cliente(Cliente.builder()
-                        .tipoPessoa(contaApi.getClienteAPI().getTipoCliente())
-                        .nome(contaApi.getClienteAPI().getCliente())
-                        .data(contaApi.getClienteAPI().getData())
-                        .documento(contaApi.getClienteAPI().getDocumento())
-                        .rg(contaApi.getClienteAPI().getRg())
-                        .serasa(contaApi.getClienteAPI().getSerasa())
-                        .nomeDoPai(contaApi.getClienteAPI().getNomeDoPai())
-                        .nomeDaMae(contaApi.getClienteAPI().getNomeDaMae())
-                        .login(Login.builder()
-                                .senha(contaApi.getClienteAPI().getLogin().getSenha())
-                                .build())
-                        .build())
-                .build();
-    }
+
 
     private Conta convertContaPessoaFisicaApiEmConta(ContaPessoaFisicaAPI contaApi) {
         return Conta.builder()
                 .numeroConta(contaApi.getNumeroConta())
                 .tipoConta(contaApi.getTipoConta())
                 .cliente(Cliente.builder()
+                        .idCliente(contaApi.getClientePessoaFisicaAPI().getIdCliente())
                         .tipoPessoa(contaApi.getClientePessoaFisicaAPI().getTipoCliente())
                         .nome(contaApi.getClientePessoaFisicaAPI().getCliente())
                         .data(contaApi.getClientePessoaFisicaAPI().getDataNascimento())
@@ -80,6 +61,7 @@ public class ContaServiceAdapter {
                         .nomeDoPai(contaApi.getClientePessoaFisicaAPI().getNomeDoPai())
                         .nomeDaMae(contaApi.getClientePessoaFisicaAPI().getNomeDaMae())
                         .login(Login.builder()
+                                .id(contaApi.getClientePessoaFisicaAPI().getLogin().getId())
                                 .senha(contaApi.getClientePessoaFisicaAPI().getLogin().getSenha())
                                 .build())
                         .build())
@@ -91,12 +73,14 @@ public class ContaServiceAdapter {
                 .numeroConta(contaApi.getNumeroConta())
                 .tipoConta(contaApi.getTipoConta())
                 .cliente(Cliente.builder()
+                        .idCliente(contaApi.getClientePessoaJuridicaAPI().getIdCliente())
                         .tipoPessoa(contaApi.getClientePessoaJuridicaAPI().getTipoCliente())
                         .nome(contaApi.getClientePessoaJuridicaAPI().getCliente())
                         .data(contaApi.getClientePessoaJuridicaAPI().getDataAbertura())
                         .documento(contaApi.getClientePessoaJuridicaAPI().getCnpj())
                         .serasa(contaApi.getClientePessoaJuridicaAPI().getSerasa())
                         .login(Login.builder()
+                                .id(contaApi.getClientePessoaJuridicaAPI().getLogin().getId())
                                 .senha(contaApi.getClientePessoaJuridicaAPI().getLogin().getSenha())
                                 .build())
                         .build())
@@ -108,6 +92,7 @@ public class ContaServiceAdapter {
                 .numeroConta(contaEntity.getNumeroConta())
                 .tipoConta(contaEntity.getTipoConta())
                 .cliente(Cliente.builder()
+                        .idCliente(contaEntity.getClienteEntity().getIdCliente())
                         .tipoPessoa(contaEntity.getClienteEntity().getTipoCliente())
                         .nome(contaEntity.getClienteEntity().getCliente())
                         .data(contaEntity.getClienteEntity().getData())
@@ -117,6 +102,7 @@ public class ContaServiceAdapter {
                         .nomeDaMae(contaEntity.getClienteEntity().getNomeDaMae())
                         .nomeDoPai(contaEntity.getClienteEntity().getNomeDoPai())
                         .login(Login.builder()
+                                .id(contaEntity.getClienteEntity().getLoginEntity().getId())
                                 .senha(contaEntity.getClienteEntity().getLoginEntity().getSenha())
                                 .build())
                         .build())

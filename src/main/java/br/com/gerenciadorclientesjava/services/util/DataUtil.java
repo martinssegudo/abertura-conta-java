@@ -1,11 +1,11 @@
 package br.com.gerenciadorclientesjava.services.util;
 
 import br.com.gerenciadorclientesjava.services.entities.enuns.TipoPessoaEnum;
-import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
+import br.com.gerenciadorclientesjava.services.exceptions.DataMenorException;
+import br.com.gerenciadorclientesjava.services.exceptions.DataParseException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class DataUtil {
 
-    public static void validaNascimento(Integer tipoPessoa, String dataString) throws ContaException, ParseException {
+    public static void validaNascimento(Integer tipoPessoa, String dataString) throws DataMenorException, DataParseException {
 
         SimpleDateFormat formato;
         Date data;
@@ -34,13 +34,13 @@ public class DataUtil {
                 if (anos >= 18) {
                     check = true;
                 } else {
-                    throw new ContaException("Idade Menor que 18 anos");
+                    throw new DataMenorException();
                 }
             }
 
         }catch(ParseException e) {
 
-            throw new ContaException("Data Invalida");
+            throw new DataParseException();
 
         }
     }

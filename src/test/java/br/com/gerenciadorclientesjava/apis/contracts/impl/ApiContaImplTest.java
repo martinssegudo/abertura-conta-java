@@ -1,371 +1,307 @@
 package br.com.gerenciadorclientesjava.apis.contracts.impl;
+
 import br.com.gerenciadorclientesjava.adapters.conta.*;
-import br.com.gerenciadorclientesjava.apis.contracts.ApiConta;
-import br.com.gerenciadorclientesjava.apis.entities.ContaAPI;
-import br.com.gerenciadorclientesjava.apis.entities.ContaPessoaFisicaAPI;
-import br.com.gerenciadorclientesjava.apis.entities.ContaPessoaJuridicaAPI;
-import br.com.gerenciadorclientesjava.db.contracts.RepositorioContaEntity;
-import br.com.gerenciadorclientesjava.factory.contracts.impl.FabricaInstanciasImpl;
+import br.com.gerenciadorclientesjava.apis.entities.*;
 import br.com.gerenciadorclientesjava.services.contracts.ContaService;
-import br.com.gerenciadorclientesjava.services.contracts.impl.ContaServiceImpl;
-import br.com.gerenciadorclientesjava.services.entities.Cliente;
-import br.com.gerenciadorclientesjava.services.entities.Conta;
-import br.com.gerenciadorclientesjava.factory.contracts.FabricaInstancias;
-import br.com.gerenciadorclientesjava.services.entities.Login;
-import br.com.gerenciadorclientesjava.services.entities.enuns.TipoContaEnum;
 import br.com.gerenciadorclientesjava.services.entities.enuns.TipoPessoaEnum;
-import br.com.gerenciadorclientesjava.services.exceptions.ContaException;
-import org.junit.Assert;
+import br.com.gerenciadorclientesjava.services.exceptions.ContaInexistenteException;
+import br.com.gerenciadorclientesjava.services.exceptions.LoginException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
+import org.springframework.web.util.NestedServletException;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
+import static br.com.gerenciadorclientesjava.apis.utils.JsonConvertUtils.asJsonString;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.core.Is.is;
+
 
 public class ApiContaImplTest {
+        private static final String CONTA_API_URL_PATH = "/api/v1/contas";
+   // private static final long VALID_BEER_ID = 1L;
+   // private static final long INVALID_BEER_ID = 2l;
+   // private static final String BEER_API_SUBPATH_INCREMENT_URL = "/increment";
+   // private static final String BEER_API_SUBPATH_DECREMENT_URL = "/decrement";
+
+    private MockMvc mockMvc;
 
     @Mock
-    RepositorioContaEntity contaRepositorio;
-    @Mock
-    FabricaInstancias fabricaInstancias;
-    @Mock
-    ContaService contaService;
-    @Mock
-    ApiConta apiConta;
+    private ContaService contaService;
+
     @InjectMocks
-    FabricaInstanciasImpl fabricaInstanciasImpl;
-    @InjectMocks
-    ApiContaImpl apiContaImpl;
-    @InjectMocks
-    ContaServiceImpl contaServiceImpl;
+    private ApiContaImpl apiContaImpl;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+   // @Before
+   // public void setUpMockitoAnnotations(){
+   //     MockitoAnnotations.initMocks(this);
+   // }
+
+  @Before
+   public void setUp(){
+      MockitoAnnotations.initMocks(this);
+      mockMvc = MockMvcBuilders.standaloneSetup(apiContaImpl)
+               .setCustomArgumentResolvers( new PageableHandlerMethodArgumentResolver())
+                .setViewResolvers((s, locale) -> new MappingJackson2JsonView())
+                .build();
     }
 
 
     @Test
-    public void testApiSalvarContaJuridicaSucesso() throws ContaException, ParseException {
-
-        Conta conta =  Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("12345678901234")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
+    public void whenPOSTIsCalledThenAContaPessoaFisicaIsOK() throws Exception {
+        ContaPessoaFisicaAPI contaAPI = ContaPessoaFisicaAPI.builder()
+                .numeroConta(1L)
+                .tipoConta("1")
+                .clientePessoaFisicaAPI(ClientePessoaFisicaAPI
+                        .builder()
+                        .idCliente(1L)
+                        .cliente("Claudio Francisco das Neves")
+                        .nomeDaMae("Severina Maria das Neves")
+                        .nomeDoPai("Manoel Franco de Alquino")
                         .serasa(600)
-                        .login(Login.builder()
+                        .rg("305965827")
+                        .tipoCliente(TipoPessoaEnum.FISICA.ordinal())
+                        .cpf("29328172802")
+                        .dataNascimento("20/09/2000")
+                        .login(LoginAPI.builder()
+                                .id(1L)
                                 .senha("@Neves123")
                                 .build())
-                        .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
                         .build())
-                .tipoConta(String.valueOf(TipoContaEnum.CORRENTE.ordinal()))
                 .build();
 
-        Conta contaReturn = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("12345678901234")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
+        when(contaService.salvarConta(new ContaServiceAdapter(contaAPI).getConta())).thenReturn(new ContaServiceAdapter(contaAPI).getConta());
+        mockMvc.perform(post(CONTA_API_URL_PATH + "/salvarcontapessoafisica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(contaAPI)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tipoConta", is(contaAPI.getTipoConta())))
+                .andExpect(jsonPath("$.numeroConta", is(contaAPI.getNumeroConta().intValue())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.idCliente", is(contaAPI.getClientePessoaFisicaAPI().getIdCliente().intValue())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.tipoCliente", is(contaAPI.getClientePessoaFisicaAPI().getTipoCliente())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.cliente", is(contaAPI.getClientePessoaFisicaAPI().getCliente())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.login.id", is(contaAPI.getClientePessoaFisicaAPI().getLogin().getId().intValue())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.login.senha", is(contaAPI.getClientePessoaFisicaAPI().getLogin().getSenha())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.dataNascimento", is(contaAPI.getClientePessoaFisicaAPI().getDataNascimento())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.nomeDaMae", is(contaAPI.getClientePessoaFisicaAPI().getNomeDaMae())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.nomeDoPai", is(contaAPI.getClientePessoaFisicaAPI().getNomeDoPai())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.rg", is(contaAPI.getClientePessoaFisicaAPI().getRg())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.serasa", is(contaAPI.getClientePessoaFisicaAPI().getSerasa())))
+                .andExpect(jsonPath("$.clientePessoaFisicaAPI.cpf", is(contaAPI.getClientePessoaFisicaAPI().getCpf())));
+    }
+
+    @Test
+    public void whenPOSTIsCalledThenAContaPessoaJuridicaIsOK() throws Exception {
+        ContaPessoaJuridicaAPI contaAPI = ContaPessoaJuridicaAPI.builder()
+                .numeroConta(1L)
+                .tipoConta("1")
+                .clientePessoaJuridicaAPI(ClientePessoaJuridicaAPI
+                        .builder()
+                        .idCliente(1L)
+                        .cliente("Claudio S/A")
                         .serasa(600)
-                        .login(Login.builder()
+                        .tipoCliente(TipoPessoaEnum.JURIDICA.ordinal())
+                        .cnpj("12345678901234")
+                        .dataAbertura("20/09/2000")
+                        .login(LoginAPI.builder()
+                                .id(1L)
                                 .senha("@Neves123")
                                 .build())
-                        .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
                         .build())
-                .tipoConta(String.valueOf(TipoContaEnum.CORRENTE.ordinal()))
                 .build();
 
-        ContaPessoaJuridicaAPI contaAPI = new ContaPessoaJuridicaApiAdapter(conta).getContaPessoaJuridicaApi();
-        when(contaService.salvarConta(any(Conta.class))).thenReturn(contaReturn);
-        ResponseEntity<ContaPessoaJuridicaAPI> result = apiContaImpl.salvarContaPessoaJuridica(contaAPI);
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.OK);
+        when(contaService.salvarConta(new ContaServiceAdapter(contaAPI).getConta())).thenReturn(new ContaServiceAdapter(contaAPI).getConta());
+        mockMvc.perform(post(CONTA_API_URL_PATH + "/salvarcontapessoajuridica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(contaAPI)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tipoConta", is(contaAPI.getTipoConta())))
+                .andExpect(jsonPath("$.numeroConta", is(contaAPI.getNumeroConta().intValue())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.idCliente", is(contaAPI.getClientePessoaJuridicaAPI().getIdCliente().intValue())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.tipoCliente", is(contaAPI.getClientePessoaJuridicaAPI().getTipoCliente())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.cliente", is(contaAPI.getClientePessoaJuridicaAPI().getCliente())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.login.id", is(contaAPI.getClientePessoaJuridicaAPI().getLogin().getId().intValue())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.login.senha", is(contaAPI.getClientePessoaJuridicaAPI().getLogin().getSenha())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.dataAbertura", is(contaAPI.getClientePessoaJuridicaAPI().getDataAbertura())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.serasa", is(contaAPI.getClientePessoaJuridicaAPI().getSerasa())))
+                .andExpect(jsonPath("$.clientePessoaJuridicaAPI.cnpj", is(contaAPI.getClientePessoaJuridicaAPI().getCnpj())));
+    }
+
+    @Test
+    public void whenPOSTIsCalledWithoutRequiredFieldInContaPessoaFisicaThenAnErrorIsReturned() throws Exception {
+        ContaPessoaFisicaAPI contaAPI = ContaPessoaFisicaAPI.builder()
+                .numeroConta(1L)
+                .tipoConta("1")
+                .clientePessoaFisicaAPI(ClientePessoaFisicaAPI
+                        .builder()
+                        .idCliente(1L)
+                        .cliente("Claudio Francisco das Neves")
+                        .nomeDaMae("Severina Maria das Neves")
+                        .nomeDoPai("Manoel Franco de Alquino")
+                        .serasa(600)
+                        .rg("305965827")
+                        .tipoCliente(TipoPessoaEnum.FISICA.ordinal())
+                        .cpf("29328172802")
+                        .dataNascimento("20/09/2000")
+                        .login(LoginAPI.builder()
+                                .id(1L)
+                                .senha("@Neves123")
+                                .build())
+                        .build())
+                .build();
+        contaAPI.setTipoConta(null);
+        mockMvc.perform(post(CONTA_API_URL_PATH + "/salvarcontapessoafisica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(contaAPI)))
+                .andExpect(status().isBadRequest());
+
 
     }
 
     @Test
-    public void testApiSalvarContaFisicaErro() throws ContaException, ParseException {
+    public void whenPOSTIsCalledWithoutRequiredFieldInContaPessoaJuridicaThenAnErrorIsReturned() throws Exception {
+        ContaPessoaJuridicaAPI contaAPI = ContaPessoaJuridicaAPI.builder()
+                .numeroConta(1L)
+                .tipoConta("1")
+                .clientePessoaJuridicaAPI(ClientePessoaJuridicaAPI
+                        .builder()
+                        .idCliente(1L)
+                        .cliente("Claudio S/A")
+                        .serasa(600)
+                        .tipoCliente(TipoPessoaEnum.JURIDICA.ordinal())
+                        .cnpj("12345678901234")
+                        .dataAbertura("20/09/2000")
+                        .login(LoginAPI.builder()
+                                .id(1L)
+                                .senha("@Neves123")
+                                .build())
+                        .build())
+                .build();
+        contaAPI.setTipoConta(null);
+        mockMvc.perform(post(CONTA_API_URL_PATH + "/salvarcontapessoajuridica")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(contaAPI)))
+                .andExpect(status().isBadRequest());
+    }
 
-        ContaException exception = new ContaException("Erro");
-
-        Conta contaReturn = Conta.builder()
-                .tipoConta(String.valueOf(TipoContaEnum.POUPANCA.ordinal()))
-                .cliente(Cliente.builder()
+    @Test
+   public  void whenGETIsCalledWithValidDocumentoThenOkStatusIsReturned() throws Exception {
+        ContaAPI contaAPI = ContaAPI.builder()
+                .tipoConta("1")
+                .clienteAPI(ClienteAPI
+                        .builder()
+                        .cliente("Claudio Francisco das Neves")
+                        .nomeDaMae("Severina Maria das Neves")
+                        .nomeDoPai("")
+                        .serasa(600)
+                        .rg("305965827")
+                        .tipoCliente(TipoPessoaEnum.FISICA.ordinal())
                         .documento("29328172802")
-                        .data("20/02/2000")
-                        .nome("Claudio Francisco das Neves")
-                        .login(Login.builder()
+                        .login(LoginAPI.builder()
                                 .senha("@Neves123")
                                 .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
                         .build())
                 .build();
-
-        when(contaService.salvarConta(any(Conta.class))).thenReturn(contaReturn);
-        ResponseEntity<ContaAPI> result = ResponseEntity.status(406).body(ContaAPI.builder()
-                .erro(exception.getMessage())
-                .build());
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.NOT_ACCEPTABLE);
-
+        when(contaService.buscaPorDocumento(contaAPI.getClienteAPI().getDocumento())).thenReturn(Collections.singletonList(new ContaApiServiceAdapter(contaAPI).getContaAPI()));
+        mockMvc.perform(get(CONTA_API_URL_PATH + "/" + contaAPI.getClienteAPI().getDocumento())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].numeroConta", is(contaAPI.getNumeroConta())))
+                .andExpect(jsonPath("$[0].clienteAPI.cliente", is(contaAPI.getClienteAPI().getCliente())))
+                .andExpect(jsonPath("$[0].tipoConta", is(contaAPI.getTipoConta())));
     }
 
     @Test
-    public void testApiSalvarContaJuridicaErro() throws ContaException {
-
-        ContaException exception = new ContaException("Erro");
-
-        Conta contaReturn = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("12345678901234")
-                        .data("20/02/2000")
-                        .nome("Cláudio S/A")
-                        .login(Login.builder()
+    public void whenGETIsCalledWithoutRegistredDocumentoThenNotFoundStatusReturned() throws Exception {
+        ContaAPI contaAPI = ContaAPI.builder()
+                .tipoConta("1")
+                .clienteAPI(ClienteAPI
+                        .builder()
+                        .cliente("Claudio Francisco das Neves")
+                        .nomeDaMae("Severina Maria das Neves")
+                        .nomeDoPai("")
+                        .serasa(600)
+                        .rg("305965827")
+                        .tipoCliente(TipoPessoaEnum.FISICA.ordinal())
+                        .documento("29328172802")
+                        .login(LoginAPI.builder()
                                 .senha("@Neves123")
                                 .build())
-                        .serasa(600)
-                        .tipoPessoa(TipoPessoaEnum.JURIDICA.ordinal())
                         .build())
                 .build();
-
-        when(contaService.salvarConta(any(Conta.class))).thenReturn(contaReturn);
-        ResponseEntity<ContaAPI> result = ResponseEntity.status(406).body(ContaAPI.builder()
-                .erro(exception.getMessage())
-                .build());
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.NOT_ACCEPTABLE);
-
+        when(contaService.buscaPorDocumento(contaAPI.getClienteAPI().getDocumento())).thenThrow(ContaInexistenteException.class);
+        mockMvc.perform(get(CONTA_API_URL_PATH + "/"+ contaAPI.getClienteAPI().getDocumento())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void testApiSalvarContaFisicaSucesso() throws ContaException, ParseException {
-
-        Conta conta = Conta.builder()
-                .cliente(Cliente.builder()
+    public  void whenGETIsCalledWithValidLoginThenOkStatusIsReturned() throws Exception {
+        ContaAPI contaAPI = ContaAPI.builder()
+                .numeroConta(1L)
+                .tipoConta("1")
+                .clienteAPI(ClienteAPI
+                        .builder()
+                        .cliente("Claudio Francisco das Neves")
+                        .nomeDaMae("Severina Maria das Neves")
+                        .nomeDoPai("")
+                        .serasa(600)
+                        .rg("305965827")
+                        .tipoCliente(TipoPessoaEnum.FISICA.ordinal())
                         .documento("29328172802")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
-                        .login(Login.builder()
+                        .login(LoginAPI.builder()
                                 .senha("@Neves123")
                                 .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
                         .build())
                 .build();
-
-        Conta contaReturn = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("29328172802")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves123")
-                                .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .build();
-
-        ContaPessoaFisicaAPI contaAPI = new ContaPessoaFisicaApiAdapter(conta).getContaPessoaFisicaApi();
-        when(contaService.salvarConta(any(Conta.class))).thenReturn(contaReturn);
-        ResponseEntity<ContaPessoaFisicaAPI> result = apiContaImpl.salvarContaPessoaFisica(contaAPI);
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.OK);
+        when(contaService.login(contaAPI.getClienteAPI().getDocumento(),contaAPI.getClienteAPI().getLogin().getSenha(),contaAPI.getTipoConta())).thenReturn(new ContaApiServiceAdapter(contaAPI).getContaAPI());
+        mockMvc.perform(get(CONTA_API_URL_PATH + "/login/" + contaAPI.getClienteAPI().getDocumento()+"/"+contaAPI.getClienteAPI().getLogin().getSenha()+"/"+contaAPI.getTipoConta())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.numeroConta", is(contaAPI.getNumeroConta().intValue())))
+                .andExpect(jsonPath("$.clienteAPI.cliente", is(contaAPI.getClienteAPI().getCliente())))
+                .andExpect(jsonPath("$.tipoConta", is(contaAPI.getTipoConta())));
     }
 
     @Test
-    public void testApiLoginSucesso() throws ContaException, ParseException {
-
-        Conta conta = Conta.builder()
-                .cliente(Cliente.builder()
+    public  void whenGETIsCalledWithoutRegistredLoginThenNotFoundStatusIsReturned() throws Exception {
+        ContaAPI contaAPI = ContaAPI.builder()
+                .numeroConta(1L)
+                .tipoConta("0")
+                .clienteAPI(ClienteAPI
+                        .builder()
+                        .idCliente(1L)
+                        .cliente("Claudio Francisco das Neves")
+                        .nomeDaMae("Severina Maria das Neves")
+                        .nomeDoPai("")
+                        .serasa(600)
+                        .rg("305965827")
+                        .tipoCliente(TipoPessoaEnum.FISICA.ordinal())
                         .documento("29328172802")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
-                        .login(Login.builder()
+                        .login(LoginAPI.builder()
+                                .id(1L)
                                 .senha("@Neves123")
                                 .build())
-                        .serasa(600)
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .nomeDaMae("Severina Maria das Neves")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
                         .build())
                 .build();
-
-        Conta contaReturn = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("29328172802")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves123")
-                                .build())
-                        .serasa(600)
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .nomeDaMae("Severina Maria das Neves")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .build();
-
-        ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
-        when(contaService.login(conta.getCliente().getDocumento(),conta.getCliente().getLogin().getSenha(),conta.getTipoConta())).thenReturn(contaReturn);
-        ResponseEntity<ContaAPI> result = apiContaImpl.login(conta.getCliente().getDocumento(),conta.getCliente().getLogin().getSenha(),conta.getTipoConta());
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.OK);
+        when(contaService.login(contaAPI.getClienteAPI().getDocumento(),contaAPI.getClienteAPI().getLogin().getSenha(),contaAPI.getTipoConta())).thenThrow(LoginException.class);
+        mockMvc.perform(get(CONTA_API_URL_PATH + "/login/" + contaAPI.getClienteAPI().getDocumento()+"/"+contaAPI.getClienteAPI().getLogin().getSenha()+"/"+contaAPI.getTipoConta())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
-    @Test
-    public void testApiLoginFalha() throws ContaException, ParseException {
-
-        ContaException exception = new ContaException("Erro");
-
-        Conta conta = Conta.builder()
-                .tipoConta(String.valueOf(TipoContaEnum.POUPANCA.ordinal()))
-                .cliente(Cliente.builder()
-                        .documento("29328172800")
-                        .data("20/02/2000")
-                        .nome("Claudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves000")
-                                .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .build();
-
-        Conta contaReturn = Conta.builder()
-                .tipoConta(String.valueOf(TipoContaEnum.POUPANCA.ordinal()))
-                .cliente(Cliente.builder()
-                        .documento("29328172800")
-                        .data("20/02/2000")
-                        .nome("Claudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves000")
-                                .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .build();
-
-        ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
-        when(contaService.login("111111","222222", String.valueOf(TipoContaEnum.POUPANCA.ordinal()))).thenReturn(contaReturn);
-        ResponseEntity<ContaAPI> result = ResponseEntity.status(406).body(ContaAPI.builder()
-                .erro(exception.getMessage())
-                .build());
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.NOT_ACCEPTABLE);
-    }
-
-    @Test
-    public void testApiBuscaDocumentoFalha() throws ContaException, ParseException {
-
-        Conta conta = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("29328172802")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves000")
-                                .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .tipoConta(String.valueOf(TipoContaEnum.POUPANCA.ordinal()))
-                .build();
-
-        Conta contaReturn = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("29328172802")
-                        .data("20/02/2000")
-                        .nome("Cláudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves000")
-                                .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .tipoConta(String.valueOf(TipoContaEnum.POUPANCA.ordinal()))
-                .build();
-
-        List<Conta> contas = new ArrayList<>();
-        contas.add(contaReturn);
-
-        ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
-        when(contaService.buscaPorDocumento("293281")).thenReturn(contas);
-        ResponseEntity<List<ContaAPI>> result = ResponseEntity.status(406).body(new ContaApiAdapter(conta).getContasAPI());
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.NOT_ACCEPTABLE);
-    }
-
-    @Test
-    public void testApiBuscaDocumentoSucesso() throws ContaException, ParseException {
-
-        Conta conta = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("29328172800")
-                        .data("20/02/2000")
-                        .nome("Claudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves000")
-                                .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .build();
-
-        Conta contaReturn = Conta.builder()
-                .cliente(Cliente.builder()
-                        .documento("29328172800")
-                        .data("20/02/2000")
-                        .nome("Claudio Francisco das Neves")
-                        .login(Login.builder()
-                                .senha("@Neves000")
-                                .build())
-                        .serasa(600)
-                        .nomeDaMae("Severina Maria das Neves")
-                        .nomeDoPai("Manoel Franco de Alquino")
-                        .rg("305965827")
-                        .tipoPessoa(TipoPessoaEnum.FISICA.ordinal())
-                        .build())
-                .build();
-
-
-        List<Conta> contas = new ArrayList<>();
-        contas.add(contaReturn);
-
-        ContaAPI contaAPI = new ContaApiAdapter(conta).getContaAPI();
-        when(contaService.buscaPorDocumento("29328172800")).thenReturn(contas);
-        ResponseEntity<List<ContaAPI>> result = apiContaImpl.contaPorDocumento(contaAPI.getClienteAPI().getDocumento());
-        Assert.assertEquals(result.getStatusCode(), HttpStatus.OK);
-    }
 }
 
     //Generated with love by TestMe :) Please report issues and submit feature requests at: http://weirddev.com/forum#!/testme

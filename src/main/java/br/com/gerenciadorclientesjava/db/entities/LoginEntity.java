@@ -1,9 +1,6 @@
 package br.com.gerenciadorclientesjava.db.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -11,8 +8,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.persistence.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Entity
 @Table(name="TB_LOGIN")
@@ -31,7 +28,6 @@ public class LoginEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator ="SEQ_CLIENTE")
     private Long id;
 
-    @NotEmpty
     @Column(name="DS_SENHA", nullable = false)
     private String senha;
 

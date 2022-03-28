@@ -13,22 +13,9 @@ import java.util.List;
 public class ContaPessoaJuridicaApiAdapter {
 
     private ContaPessoaJuridicaAPI contaPessoaJuridicaApi;
-    private List<ContaPessoaJuridicaAPI> contasPessoaJuridicaAPI;
 
     public ContaPessoaJuridicaApiAdapter(Conta conta) {
         contaPessoaJuridicaApi = convertContaParaContaClientePessoaJuridicaApi(conta);
-    }
-
-    public ContaPessoaJuridicaApiAdapter(List<Conta> conta) {
-        contasPessoaJuridicaAPI = convertListContaParaListContaClientePessoaJuridicaApi(conta);
-    }
-
-    private List<ContaPessoaJuridicaAPI> convertListContaParaListContaClientePessoaJuridicaApi(List<Conta> contas) {
-        List<ContaPessoaJuridicaAPI> contasPessoaJuridicaAPI = new ArrayList<>();
-        for (Conta conta : contas) {
-            contasPessoaJuridicaAPI.add(convertContaParaContaClientePessoaJuridicaApi(conta));
-        }
-        return contasPessoaJuridicaAPI;
     }
 
     private ContaPessoaJuridicaAPI convertContaParaContaClientePessoaJuridicaApi(Conta conta) {
@@ -36,12 +23,14 @@ public class ContaPessoaJuridicaApiAdapter {
                 .numeroConta(conta.getNumeroConta())
                 .tipoConta(conta.getTipoConta())
                 .clientePessoaJuridicaAPI(ClientePessoaJuridicaAPI.builder()
+                        .idCliente(conta.getCliente().getIdCliente())
                         .tipoCliente(conta.getCliente().getTipoPessoa())
                         .cliente(conta.getCliente().getNome())
                         .dataAbertura(conta.getCliente().getData())
                         .cnpj(conta.getCliente().getDocumento())
                         .serasa(conta.getCliente().getSerasa())
                         .login(LoginAPI.builder()
+                                .id(conta.getCliente().getLogin().getId())
                                 .senha(conta.getCliente().getLogin().getSenha())
                                 .build())
                         .build())

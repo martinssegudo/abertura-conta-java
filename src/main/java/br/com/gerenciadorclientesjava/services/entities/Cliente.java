@@ -1,14 +1,11 @@
 package br.com.gerenciadorclientesjava.services.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Cliente {
 
@@ -22,4 +19,5 @@ public class Cliente {
     private String nomeDoPai;
     private String nomeDaMae;
     private Login login;
+
 }

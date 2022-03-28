@@ -1,9 +1,9 @@
 package br.com.gerenciadorclientesjava.apis.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +12,11 @@ import lombok.NoArgsConstructor;
 public class ContaPessoaFisicaAPI{
 
     private Long numeroConta;
+
+    @NotNull
+    @Size(max = 1)
     private String tipoConta;
+
     private ClientePessoaFisicaAPI clientePessoaFisicaAPI;
-    private String erro;
+
 }

@@ -1,18 +1,21 @@
 package br.com.gerenciadorclientesjava.apis.entities;
 
-import br.com.gerenciadorclientesjava.services.entities.Cliente;
-import br.com.gerenciadorclientesjava.services.entities.Conta;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class LoginAPI {
 
+
     private Long id;
+
+    @NotNull
+    @Min(6)
     private String senha;
+
 }
